@@ -13,7 +13,7 @@ public class PlayerManager : MonoBehaviour
     public float jumpForce = 6f;
 
     private float moveInput;
-    private bool isGrounded = false;
+    public bool isGrounded;
 
     private float jumpBufferTime = 0.2f;
     private float jumpBufferCounter;
@@ -36,6 +36,12 @@ public class PlayerManager : MonoBehaviour
     private bool wasRunning = false;
     private int lastDirection = 0; // -1 esquerda, 1 direita
 
+    [Header("Ground Check (2 Raycasts)")]
+    public Transform leftCheck;       // pé esquerdo
+    public Transform rightCheck;      // pé direito
+    public float groundCheckDistance = 0.2f;
+    public LayerMask groundLayer;     // escolha quais layers contam como chão
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -51,25 +57,20 @@ public class PlayerManager : MonoBehaviour
         // Detecta se está andando/correndo
         if (moveInput != 0)
         {
-            // Se continuar segurando a MESMA direção, acumula tempo
             holdTime += Time.deltaTime;
 
-            // Calcula velocidade interpolada entre walk e run
             float t = Mathf.Clamp01(holdTime / accelerationTime);
             currentSpeed = Mathf.Lerp(walkSpeed, runSpeed, t);
 
-            // Atualiza animações
-            bool isRunning = currentSpeed >= (runSpeed - 0.1f); // margem
+            bool isRunning = currentSpeed >= (runSpeed - 0.1f);
             Animator.SetBool("IsWalking", !isRunning);
             Animator.SetBool("IsRunning", isRunning);
 
-            // Acelera a animação conforme a velocidade
             float animSpeedMultiplier = Mathf.Lerp(1f, 1.5f, t);
             Animator.SetFloat("SpeedMultiplier", animSpeedMultiplier);
         }
         else
         {
-            // Reset quando solta a tecla
             holdTime = 0f;
             currentSpeed = walkSpeed;
             Animator.SetBool("IsWalking", false);
@@ -77,7 +78,7 @@ public class PlayerManager : MonoBehaviour
             Animator.SetFloat("SpeedMultiplier", 1f);
         }
 
-        // Pulo bufferizado
+        // Jump buffer
         if (Input.GetButtonDown("Jump"))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -106,15 +107,19 @@ public class PlayerManager : MonoBehaviour
             jumpCount = 0;
         }
 
-        isGrounded = false;
+        CheckGrounded();
     }
 
-    void OnCollisionStay2D(Collision2D collision)
+    void CheckGrounded()
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        bool leftHit = Physics2D.Raycast(leftCheck.position, Vector2.down, groundCheckDistance, groundLayer);
+        bool rightHit = Physics2D.Raycast(rightCheck.position, Vector2.down, groundCheckDistance, groundLayer);
+
+        isGrounded = leftHit || rightHit;
+
+        if (isGrounded)
         {
             Animator.SetBool("IsJumping", false);
-            isGrounded = true;
         }
     }
 
@@ -128,5 +133,14 @@ public class PlayerManager : MonoBehaviour
             transform.localScale = ls;
         }
     }
-}
 
+    // Debug no editor (desenha os raycasts)
+    private void OnDrawGizmosSelected()
+    {
+        if (leftCheck != null)
+            Gizmos.DrawLine(leftCheck.position, leftCheck.position + Vector3.down * groundCheckDistance);
+
+        if (rightCheck != null)
+            Gizmos.DrawLine(rightCheck.position, rightCheck.position + Vector3.down * groundCheckDistance);
+    }
+}
