@@ -4,52 +4,80 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     private Animator Animator;
+    private Rigidbody2D rb;
 
-    public float moveSpeed = 4f;
+    public float walkSpeed = 4f;      // velocidade base andando
+    public float runSpeed = 8f;       // velocidade máxima correndo
+    public float accelerationTime = 2f; // tempo segurando para atingir velocidade máxima
 
     public float jumpForce = 6f;
 
-    private Rigidbody2D rb;
-
-    private int jumpCount;
-
-    private int maxJumps = 0;
-
     private float moveInput;
-
     private bool isGrounded = false;
 
     private float jumpBufferTime = 0.2f;
     private float jumpBufferCounter;
 
+    private int jumpCount;
+    private int maxJumps = 0;
+
+    private float holdTime = 0f; // tempo segurando direção
+    private float currentSpeed;  // velocidade atual
+
     bool IsFacingRight = true;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    public float slideDuration = 0.3f;   // tempo que o player desliza ao parar
+    public float slideFriction = 0.95f;  // desaceleração durante deslize
+
+    private bool isSliding = false;
+    private float slideTimer = 0f;
+
+    // Controle de estados
+    private bool wasRunning = false;
+    private int lastDirection = 0; // -1 esquerda, 1 direita
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         Animator = GetComponent<Animator>();
+        currentSpeed = walkSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //GetAxis = permite interpolação
-        //GetAxisRaw = NÃO permite
-        //Na prática, o GetAxisRaw faz com que o movimento seja mais constante, pois,
-        //A interpolação faz uma estimativa de algo que está entre um valor e outro
-        //Por exemplo, se temos 1 e 0, ao interpolar, o movimento pode ficar em 0.5
-        //podendo ter uma aceleração até chegar no valor 1
+        flipSprite();
         moveInput = Input.GetAxisRaw("Horizontal");
 
-        if(moveInput != 0)
+        // Detecta se está andando/correndo
+        if (moveInput != 0)
         {
-            Animator.SetBool("IsRunning", true);
+            // Se continuar segurando a MESMA direção, acumula tempo
+            holdTime += Time.deltaTime;
+
+            // Calcula velocidade interpolada entre walk e run
+            float t = Mathf.Clamp01(holdTime / accelerationTime);
+            currentSpeed = Mathf.Lerp(walkSpeed, runSpeed, t);
+
+            // Atualiza animações
+            bool isRunning = currentSpeed >= (runSpeed - 0.1f); // margem
+            Animator.SetBool("IsWalking", !isRunning);
+            Animator.SetBool("IsRunning", isRunning);
+
+            // Acelera a animação conforme a velocidade
+            float animSpeedMultiplier = Mathf.Lerp(1f, 1.5f, t);
+            Animator.SetFloat("SpeedMultiplier", animSpeedMultiplier);
         }
         else
         {
+            // Reset quando solta a tecla
+            holdTime = 0f;
+            currentSpeed = walkSpeed;
+            Animator.SetBool("IsWalking", false);
             Animator.SetBool("IsRunning", false);
+            Animator.SetFloat("SpeedMultiplier", 1f);
         }
 
+        // Pulo bufferizado
         if (Input.GetButtonDown("Jump"))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -61,44 +89,21 @@ public class PlayerManager : MonoBehaviour
 
         if (jumpBufferCounter > 0 && isGrounded)
         {
-
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-            
-
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            Animator.SetBool("IsJumping",true);
+            Animator.SetBool("IsJumping", true);
             jumpCount++;
-
         }
-
     }
 
     private void FixedUpdate()
     {
-
-        // estrutura de if else ternário
-        float targetVelocity = moveInput != 0 ? moveInput * moveSpeed : 0f;
-
-
-        //estrutura padrão
-        //if (moveInput != 0)
-        //{
-        //    // Se moveInput não for 0, multiplicamos moveInput por moveSpeed e atribuímos a targetVelocityX
-        //    targetVelocity = moveInput * moveSpeed;
-        //}
-        //else
-        //{
-        //    // Se moveInput for 0, atribuimos 0 a targetVelocityX
-        //    targetVelocity = 0;
-        //}
-
+        float targetVelocity = moveInput * currentSpeed;
         rb.linearVelocity = new Vector2(targetVelocity, rb.linearVelocity.y);
 
         if (isGrounded)
         {
-
             jumpCount = 0;
-            
         }
 
         isGrounded = false;
@@ -106,16 +111,16 @@ public class PlayerManager : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D collision)
     {
-
         if (collision.gameObject.CompareTag("Ground"))
         {
             Animator.SetBool("IsJumping", false);
             isGrounded = true;
         }
     }
+
     void flipSprite()
     {
-        if(IsFacingRight && moveInput <0f || !IsFacingRight && moveInput > 0f)
+        if (IsFacingRight && moveInput < 0f || !IsFacingRight && moveInput > 0f)
         {
             IsFacingRight = !IsFacingRight;
             Vector3 ls = transform.localScale;
