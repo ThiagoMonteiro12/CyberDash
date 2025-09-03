@@ -247,7 +247,7 @@ Transform:
   m_GameObject: {fileID: 308281203}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 17.55, y: 2.15, z: 0}
+  m_LocalPosition: {x: 17.55, y: 2.31, z: 0}
   m_LocalScale: {x: 7.1607, y: 7.1607, z: 7.1607}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -301,9 +301,11 @@ MonoBehaviour:
   WallLayer:
     serializedVersion: 2
     m_Bits: 128
-  WallCheck: {fileID: 1376710948}
+  WallCheckUp: {fileID: 1163736045}
+  WallCheckDown: {fileID: 1376710948}
   WallCheckDistance: 0.2
   IsWallRunning: 0
+  WallRunSpeed: 0
 --- !u!50 &417799599
 Rigidbody2D:
   serializedVersion: 5
@@ -368,8 +370,8 @@ BoxCollider2D:
   m_Offset: {x: 0.014885783, y: 0.5010808}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5416667, y: 0}
-    oldSize: {x: 0.75, y: 1}
+    pivot: {x: 0.3809524, y: 0}
+    oldSize: {x: 0.65625, y: 0.9375}
     newSize: {x: 0.75, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -393,6 +395,7 @@ Transform:
   - {fileID: 1828186422}
   - {fileID: 501641478}
   - {fileID: 1376710948}
+  - {fileID: 1163736045}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &417799602
@@ -846,6 +849,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &1163736044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163736045}
+  m_Layer: 0
+  m_Name: WallCheckUp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1163736045
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163736044}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.229, y: 0.851, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 417799601}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1376710947
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,7 +890,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1376710948}
   m_Layer: 0
-  m_Name: WallCheck
+  m_Name: WallCheckDown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -871,7 +905,7 @@ Transform:
   m_GameObject: {fileID: 1376710947}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.369, y: 0.418, z: 0}
+  m_LocalPosition: {x: 0.369, y: 0.0041, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

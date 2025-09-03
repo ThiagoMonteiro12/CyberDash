@@ -39,7 +39,8 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Wall Check")]
     public LayerMask WallLayer;
-    public Transform WallCheck;
+    public Transform WallCheckUp;
+    public Transform WallCheckDown;
     public float WallCheckDistance = 0.2f;
     public bool IsWallRunning = false;
     public float WallRunSpeed;
@@ -161,11 +162,13 @@ public class PlayerManager : MonoBehaviour
             direction = Vector2.left;
 
 
-        bool WallHit = Physics2D.Raycast(WallCheck.position, direction, WallCheckDistance, WallLayer);
+        bool WallHitUP = Physics2D.Raycast(WallCheckUp.position, direction, WallCheckDistance, WallLayer);
+        bool WallHitDown = Physics2D.Raycast(WallCheckDown.position, direction, WallCheckDistance, WallLayer);
 
-        if (WallHit == true && currentSpeed == runSpeed)
+        if (WallHitDown == true || WallHitUP == true && currentSpeed == runSpeed)
         {
             IsWallRunning = true;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 10f);
         }
         else
         {
