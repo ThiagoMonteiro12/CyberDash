@@ -66,6 +66,7 @@ public class PlayerManager : MonoBehaviour
         ApplyMovement();
         CheckGrounded();
         CheckWallRunning();
+        CheckFalling();
     }
 
     private void OnDrawGizmosSelected()
@@ -134,11 +135,23 @@ public class PlayerManager : MonoBehaviour
 
         if (jumpBufferCounter > 0 && isGrounded)
         {
+            jumpBufferCounter = 0;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
-            animator.SetBool("IsJumping", true);
+            animator.SetTrigger("IsJumping");
             jumpCount++;
+        }
+    }
+    void CheckFalling()
+    {
+       if (rb.linearVelocityY < 0.1f)
+        {
+            animator.SetBool("IsFalling", true);
+        }
+        else
+        {
+            animator.SetBool("IsFalling", false);
         }
     }
 
@@ -149,8 +162,15 @@ public class PlayerManager : MonoBehaviour
 
         isGrounded = leftHit || rightHit;
 
-        if (isGrounded)
-            animator.SetBool("IsJumping", false);
+        if ( isGrounded == true)
+        {
+            animator.SetBool("IsGrounded", true);
+        }
+        else
+        {
+            animator.SetBool("IsGrounded", false);
+        }
+
     }
     void CheckWallRunning()
     {
@@ -165,7 +185,7 @@ public class PlayerManager : MonoBehaviour
         bool WallHitUP = Physics2D.Raycast(WallCheckUp.position, direction, WallCheckDistance, WallLayer);
         bool WallHitDown = Physics2D.Raycast(WallCheckDown.position, direction, WallCheckDistance, WallLayer);
 
-        if (WallHitDown == true || WallHitUP == true && currentSpeed == runSpeed)
+        if (currentSpeed == runSpeed && WallHitDown == true || WallHitUP == true )
         {
             IsWallRunning = true;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 10f);
