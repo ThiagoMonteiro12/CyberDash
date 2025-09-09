@@ -24,6 +24,8 @@ public class PlayerManager : MonoBehaviour
     // Jump Buffer
     private float jumpBufferTime = 0.2f;
     private float jumpBufferCounter;
+    private float jumpTimeCounter;
+    public float jumpTime;
 
 
     // Controle de estados
@@ -41,7 +43,7 @@ public class PlayerManager : MonoBehaviour
     public LayerMask WallLayer;
     public Transform WallCheckUp;
     public Transform WallCheckDown;
-    public float WallCheckDistance = 0.2f;
+    public float WallCheckDistance = 0.3f;
     public bool IsWallRunning = false;
     public float WallRunSpeed;
     // ==================== UNITY ====================
@@ -136,11 +138,18 @@ public class PlayerManager : MonoBehaviour
         if (jumpBufferCounter > 0 && isGrounded)
         {
             jumpBufferCounter = 0;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            rb.linearVelocity = Vector2.up * jumpForce;
 
             animator.SetTrigger("IsJumping");
             jumpCount++;
+        }
+        if (Input.GetButton("Jump"))
+        {
+            if(jumpTimeCounter  > 0)
+            {
+                rb.linearVelocity = Vector2.up * jumpForce;
+                jumpTimeCounter -= Time.deltaTime; 
+            }
         }
     }
     void CheckFalling()
@@ -165,6 +174,7 @@ public class PlayerManager : MonoBehaviour
         if ( isGrounded == true)
         {
             animator.SetBool("IsGrounded", true);
+            jumpTimeCounter = jumpTime;
         }
         else
         {
@@ -189,10 +199,12 @@ public class PlayerManager : MonoBehaviour
         {
             IsWallRunning = true;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 10f);
+            animator.SetBool("IsWallRunning", true);
         }
         else
         {
             IsWallRunning = false;
+            animator.SetBool("IsWallRunning", false);
         }
 
     }
