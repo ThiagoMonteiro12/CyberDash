@@ -20,6 +20,7 @@ public class PlayerManager : MonoBehaviour
     public float jumpForce = 6f;
     private int jumpCount;
     private int maxJumps = 0;
+    private bool IsJumping = false;
 
     // Jump Buffer
     private float jumpBufferTime = 0.2f;
@@ -139,17 +140,24 @@ public class PlayerManager : MonoBehaviour
         {
             jumpBufferCounter = 0;
             rb.linearVelocity = Vector2.up * jumpForce;
-
+            IsJumping = true;
             animator.SetTrigger("IsJumping");
-            jumpCount++;
         }
-        if (Input.GetButton("Jump"))
+        if (Input.GetButton("Jump") && IsJumping == true)
         {
             if(jumpTimeCounter  > 0)
             {
                 rb.linearVelocity = Vector2.up * jumpForce;
-                jumpTimeCounter -= Time.deltaTime; 
+                jumpTimeCounter -= Time.deltaTime;
             }
+            else
+            {
+                IsJumping = false;
+            }
+        }
+        if (Input.GetButtonUp("Jump"))
+        {
+            IsJumping = false;
         }
     }
     void CheckFalling()
@@ -198,7 +206,7 @@ public class PlayerManager : MonoBehaviour
         if (currentSpeed == runSpeed && WallHitDown == true || WallHitUP == true )
         {
             IsWallRunning = true;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 10f);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 6f);
             animator.SetBool("IsWallRunning", true);
         }
         else
