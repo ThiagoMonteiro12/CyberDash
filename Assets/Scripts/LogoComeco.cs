@@ -69,9 +69,6 @@ public class LogoAnimacao : MonoBehaviour
             musicaSource.clip = musicaLoop;
             musicaSource.loop = true;
             musicaSource.Play();
-
-            // mantém o objeto mesmo trocando de cena (opcional)
-            DontDestroyOnLoad(musicaObj);
         }
     }
 }
