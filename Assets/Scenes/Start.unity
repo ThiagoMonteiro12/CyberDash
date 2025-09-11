@@ -360,7 +360,7 @@ MonoBehaviour:
   logoOff: {fileID: -3973972148574142445, guid: 0ec53506d547d8647a4a522cd4af7a51, type: 3}
   logoOn: {fileID: -8209009684121827695, guid: 59144098c405d7b45be27020e78a1673, type: 3}
   neonSound: {fileID: 8300000, guid: 54836e1281b1bf945a26642ddddd2f1e, type: 3}
-  musicaLoop: {fileID: 8300000, guid: c1c60cbd75f7279489a378f44bfe8c23, type: 3}
+  musicaLoop: {fileID: 8300000, guid: bef6cedd7a2618a438f93b4bd0efa311, type: 3}
   delayInicial: 0.3
   delaySom: 0.2
   quantidadePiscadas: 2

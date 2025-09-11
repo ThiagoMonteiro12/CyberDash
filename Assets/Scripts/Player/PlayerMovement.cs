@@ -14,7 +14,10 @@ public class PlayerManager : MonoBehaviour
     private float holdTime = 0f;       // Tempo segurando direção
     private float currentSpeed;        // Velocidade atual
     private float moveInput;           // Entrada horizontal
-    private bool isFacingRight = true; // Direção do sprite
+
+    [Header("Estado Público")]
+    public bool isFacingRight = true; // Direção do sprite
+    public bool IsRunning { get; private set; } // <-- AGORA PÚBLICO (só leitura de fora)
 
     [Header("Pulo")]
     public float jumpForce = 6f;
@@ -27,11 +30,6 @@ public class PlayerManager : MonoBehaviour
     private float jumpBufferCounter;
     private float jumpTimeCounter;
     public float jumpTime;
-
-
-    // Controle de estados
-    private bool wasRunning = false;
-    private int lastDirection = 0; // -1 esquerda, 1 direita
 
     [Header("Ground Check (2 Raycasts)")]
     public Transform leftCheck;         // Pé esquerdo
@@ -47,6 +45,7 @@ public class PlayerManager : MonoBehaviour
     public float WallCheckDistance = 0.3f;
     public bool IsWallRunning = false;
     public float WallRunSpeed;
+
     // ==================== UNITY ====================
 
     void Start()
@@ -108,9 +107,11 @@ public class PlayerManager : MonoBehaviour
             float t = Mathf.Clamp01(holdTime / accelerationTime);
             currentSpeed = Mathf.Lerp(walkSpeed, runSpeed, t);
 
-            bool isRunning = currentSpeed >= (runSpeed - 0.1f);
-            animator.SetBool("IsWalking", !isRunning);
-            animator.SetBool("IsRunning", isRunning);
+            // Atualiza variável pública
+            IsRunning = currentSpeed >= (runSpeed - 0.1f);
+
+            animator.SetBool("IsWalking", !IsRunning);
+            animator.SetBool("IsRunning", IsRunning);
 
             // Multiplicador de velocidade da animação
             float animSpeedMultiplier = Mathf.Lerp(1f, 1.5f, t);
@@ -120,6 +121,8 @@ public class PlayerManager : MonoBehaviour
         {
             holdTime = 0f;
             currentSpeed = walkSpeed;
+
+            IsRunning = false;
 
             animator.SetBool("IsWalking", false);
             animator.SetBool("IsRunning", false);
@@ -145,7 +148,7 @@ public class PlayerManager : MonoBehaviour
         }
         if (Input.GetButton("Jump") && IsJumping == true)
         {
-            if(jumpTimeCounter  > 0)
+            if (jumpTimeCounter > 0)
             {
                 rb.linearVelocity = Vector2.up * jumpForce;
                 jumpTimeCounter -= Time.deltaTime;
@@ -160,9 +163,10 @@ public class PlayerManager : MonoBehaviour
             IsJumping = false;
         }
     }
+
     void CheckFalling()
     {
-       if (rb.linearVelocityY < 0.1f)
+        if (rb.linearVelocityY < 0.1f)
         {
             animator.SetBool("IsFalling", true);
         }
@@ -179,7 +183,7 @@ public class PlayerManager : MonoBehaviour
 
         isGrounded = leftHit || rightHit;
 
-        if ( isGrounded == true)
+        if (isGrounded == true)
         {
             animator.SetBool("IsGrounded", true);
             jumpTimeCounter = jumpTime;
@@ -190,6 +194,7 @@ public class PlayerManager : MonoBehaviour
         }
 
     }
+
     void CheckWallRunning()
     {
         Vector2 direction;
@@ -199,11 +204,10 @@ public class PlayerManager : MonoBehaviour
         else
             direction = Vector2.left;
 
-
         bool WallHitUP = Physics2D.Raycast(WallCheckUp.position, direction, WallCheckDistance, WallLayer);
         bool WallHitDown = Physics2D.Raycast(WallCheckDown.position, direction, WallCheckDistance, WallLayer);
 
-        if (currentSpeed == runSpeed && WallHitDown == true || WallHitUP == true )
+        if (currentSpeed == runSpeed && WallHitDown == true || WallHitUP == true)
         {
             IsWallRunning = true;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 6f);
@@ -214,7 +218,6 @@ public class PlayerManager : MonoBehaviour
             IsWallRunning = false;
             animator.SetBool("IsWallRunning", false);
         }
-
     }
 
     // ==================== SPRITE ====================
