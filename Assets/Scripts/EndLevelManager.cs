@@ -41,6 +41,7 @@ public class EndLevelManager : MonoBehaviour
         }
     }
 
+    // Chamar isso quando o jogador terminar o nível
     public void TriggerEndLevel()
     {
         if (isEnding) return;
@@ -76,17 +77,15 @@ public class EndLevelManager : MonoBehaviour
     {
         string openTag = $"<color={hexColor}>";
         string closeTag = "</color>";
-        string current = "";
 
         for (int i = 0; i < text.Length; i++)
         {
-            current = text.Substring(0, i + 1);
-            consoleText.text += openTag + current + closeTag;
+            // Vai adicionando caractere por caractere
+            consoleText.text += openTag + text[i] + closeTag;
             yield return new WaitForSecondsRealtime(charDelay);
-            consoleText.text = consoleText.text.Remove(consoleText.text.Length - (openTag.Length + closeTag.Length + current.Length));
         }
 
-        consoleText.text += openTag + text + closeTag + "\n";
+        consoleText.text += "\n"; // quebra de linha no final
     }
 
     IEnumerator BlinkPressText()
