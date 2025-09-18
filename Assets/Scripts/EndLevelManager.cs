@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using TMPro;
 
@@ -28,7 +28,7 @@ public class EndLevelManager : MonoBehaviour
         if (endLevelPanel != null) endLevelPanel.SetActive(false);
         if (pressEnterText != null) pressEnterText.enabled = false;
 
-        levelStartTime = Time.time; // marca o tempo de início do nível
+        levelStartTime = Time.time; // marca o tempo de inÃ­cio do nÃ­vel
     }
 
     void Update()
@@ -41,7 +41,7 @@ public class EndLevelManager : MonoBehaviour
         }
     }
 
-    // Chamar isso quando o jogador terminar o nível
+    // Chamar isso quando o jogador terminar o nÃ­vel
     public void TriggerEndLevel()
     {
         if (isEnding) return;
@@ -51,6 +51,8 @@ public class EndLevelManager : MonoBehaviour
         consoleText.text = "";
 
         Time.timeScale = 0f; // pausa o jogo
+
+        MusicController.Instance.PlayMuffledMusic();
 
         float elapsed = Time.time - levelStartTime;
         string timeString = $"Level completed in {elapsed:F2} seconds";

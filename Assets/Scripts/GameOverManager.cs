@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -41,20 +40,6 @@ public class GameOverManager : MonoBehaviour
         {
             Restart();
         }
-    }
-
-    public void TriggerGameOver()
-    {
-        if (isGameOver) return;
-        isGameOver = true;
-
-        gameOverPanel.SetActive(true);
-        consoleText.text = "";
-
-        Time.timeScale = 0f;
-
-        // come�a a corrotina que imprime as linhas
-        StartCoroutine(PrintConsoleSequence());
     }
 
     IEnumerator PrintConsoleSequence()
@@ -101,6 +86,21 @@ public class GameOverManager : MonoBehaviour
             yield return new WaitForSecondsRealtime(blinkInterval);
         }
     }
+    public void TriggerGameOver()
+    {
+        if (isGameOver) return;
+        isGameOver = true;
+
+        gameOverPanel.SetActive(true);
+        consoleText.text = "";
+
+        Time.timeScale = 0f;
+
+        MusicController.Instance.PlayMuffledMusic();
+
+        // começa a corrotina que imprime as linhas
+        StartCoroutine(PrintConsoleSequence());
+    }
 
     public void Restart()
     {
@@ -108,6 +108,12 @@ public class GameOverManager : MonoBehaviour
         if (blinkRoutine != null) StopCoroutine(blinkRoutine);
 
         Time.timeScale = 1f;
+
+        
+            MusicController.Instance.PlayNormalMusic();
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
+
 }
